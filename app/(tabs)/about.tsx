@@ -1,19 +1,16 @@
-import { Link, Stack } from "expo-router";
+import { Link } from "expo-router";
 import React from "react";
 import { Text, View, StyleSheet } from "react-native";
 
 export default function About() {
   return (
     <>
-    <Stack.Screen options={{title:'opp Not Found'}}/>
     <View
       style={style.container}
     >
-      <Text style={style.Text}>No existe esta Page </Text>
+      <Text style={style.Text}>Edit app/index.tsx to edit </Text>
       <Link href={"/(tabs)"} style={style.bottom}>Volver </Link>
     </View>
-    
-    
     
     </>
   );
