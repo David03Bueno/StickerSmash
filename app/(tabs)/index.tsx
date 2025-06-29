@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { View, StyleSheet, ImageSourcePropType } from "react-native";
 import ImageViewer from "@/components/ImageViewer";
 import Button from "@/components/Button";
@@ -8,15 +8,25 @@ import IconButton from "@/components/IconButton";
 import EmojiPicker from "@/components/EmojiPicker";
 import EmojiList from "@/components/EmojiList";
 import EmojiSticker from "@/components/EmojiSticker";
+import * as MediaLibary from 'expo-media-library';
+import { captureRef } from "react-native-view-shot";
 
 const PlaceholderImage = require('@/assets/images/background-image.png')
 
 export default function Index() {
+  const imageRef = useRef(null)
+  const [permissionResponse, requestPermission] = MediaLibary.usePermissions();
+
   const [selectedImage, setselectedImage] = useState<string | undefined>(undefined)
   const [showAppOtions, setshowAppOtions] = useState<boolean>(false)
   const [isModalVisible, setisModalVisible] = useState<boolean>(false)
   const [pickeEmoji, setPickeEmoji] = useState<ImageSourcePropType  | undefined>(undefined)
 
+  useEffect(()=>{
+    if (!permissionResponse?.granted){
+      requestPermission();
+    }
+  },[])
 
   const pickImageAsync = async () => {
     let result = await ImagenPicker.launchImageLibraryAsync({
@@ -43,14 +53,26 @@ export default function Index() {
     setisModalVisible(true)
   };
   const onSaveImageAsync = async () => {
+        try {
+          const localUri = await captureRef(imageRef,{
+            height: 440,
+            quality: 1
+          });
 
+          await MediaLibary.saveToLibraryAsync(localUri);
+          if (localUri) {
+            alert("Save")
+          }
+        } catch (error) {
+          console.log(error)
+        } 
   };
 
   return (
     <View
       style={style.container}
     >
-      <View style={style.imageContainer}>
+      <View ref={imageRef} style={style.imageContainer}>
         <ImageViewer imgSource={PlaceholderImage} selectedImage={selectedImage} />
         {pickeEmoji && 
         (<EmojiSticker imageSize={40} stickerSource={pickeEmoji}/>)}
